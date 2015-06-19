@@ -22,13 +22,13 @@ def main():
 ####    for line in enrollment_train:
 ####        print(line)
 ##log_train:['enrollment_id', 'time', 'source', 'event', 'object']
-    file = open('log_train.csv', 'rt')
-    file.readline()
-    log_train = csv.reader(file)
-    for line in log_train:
-        print(line)
+##    file = open('log_train.csv', 'rt')
+##    file.readline()
+##    log_train = csv.reader(file)
+####    for line in log_train:
+####        print(line)
 ##truth_train:[id,0/1]
-    truth_train = csv.reader(open('truth_train.csv', 'rt'))
+##    truth_train = csv.reader(open('truth_train.csv', 'rt'))
 ####    for line in truth_train:
 ####        print(line)
 ##    file = open('enrollment_test.csv', 'rt')
@@ -90,123 +90,109 @@ def main():
 ##    writer.writerows(data_test)
 ##    csvfile.close()
 
-##Submission preparation
-    SubNum = []
-    file = open('sampleSubmission.csv', 'rt')
-    tmp_train = csv.reader(file)
-    j = 1
-    for line in tmp_train:
-        tmpa = int(line[0])
-        SubNum.append(tmpa)
-        if j>80362:
-            break
-        j+=1
-
-
-    X=[]
-    Y=[]
-
+##Preparation
+    X = []
     file = open('tmpTrain.csv', 'rt')
     tmp_train = csv.reader(file)
-    j = 0
     for line in tmp_train:
-        if j%2==0:
-            tmpa = [int(line[0]),int(line[1]),int(line[2]),int(line[3]),int(line[4])]
-##            print(tmpa)
-            X.append(tmpa)
-        if j>=2*120541:
-            break
-        j+=1
+        tmp_data = [int(line[1]),int(line[2]),int(line[3]),int(line[4]),int(line[5])]
+        X.append(tmp_data)
 
-    data_test = []
-    file = open('tmpTest.csv', 'rt')
-    tmp_test = csv.reader(file)
-    j = 0
-    for line in tmp_test:
-        if j%2==0:
-            tmpa = [int(line[0]),int(line[1]),int(line[2]),int(line[3]),int(line[4])]
-            data_test.append(tmpa)
-        if j>2*80362:
-            break
-        j+=1
-
-
-
+    Y = []
+    file = open('truth_train.csv', 'rt')
+    truth_train = csv.reader(file)
     for line in truth_train:
-##        X.append(data_train[int(line[0])]);
         if line[1]=='0':
             Y.append(0);
         if line[1]=='1':
             Y.append(1);
 
+    data_test = []
+    file = open('tmpTest.csv', 'rt')
+    tmp_test = csv.reader(file)
+    for line in tmp_test:
+        tmp_data = [int(line[1]),int(line[2]),int(line[3]),int(line[4]),int(line[5])]
+        data_test.append(tmp_data)
+
+    SubNum = []
+    file = open('sampleSubmission.csv', 'rt')
+    sampSub = csv.reader(file)
+    for line in sampSub:
+        SubNum.append(int(line[0]))
+
+
     print('Prepare DONE!')
+    print(len(X))
+    print(len(Y))
+    print(len(data_test))
+    print(len(SubNum))
+
 ##SVM
-    clf = svm.SVC()
-    clf.fit(X, Y)
-    resSVC = []
-    for item in data_test:
-        tmpRes = clf.predict(item)
-        if tmpRes == 0:
-            resSVC.append(0)
-        if tmpRes == 1:
-            resSVC.append(1)
-    csvfile = open('resSVM.csv', 'w',newline='')
-    writer = csv.writer(csvfile)
-    for i in range (1,80363):
-        writer.writerow([SubNum[i-1],resSVC[i-1]])
-    csvfile.close()
-    print('SVM DONE!')
+    # clf = svm.SVC()
+    # clf.fit(X, Y)
+    # resSVC = []
+    # for item in data_test:
+    #     tmpRes = clf.predict(item)
+    #     if tmpRes == 0:
+    #         resSVC.append(0)
+    #     if tmpRes == 1:
+    #         resSVC.append(1)
+    # csvfile = open('resSVM.csv', 'w',newline='')
+    # writer = csv.writer(csvfile)
+    # for i in range (1,80363):
+    #     writer.writerow([SubNum[i-1],resSVC[i-1]])
+    # csvfile.close()
+    # print('SVM DONE!')
 
 ##SGD
-    clf = SGDClassifier(loss="hinge", penalty="l2")
-    clf.fit(X, Y)
-    resSGD = []
-    for item in data_test:
-        tmpRes = clf.predict(item)
-        if tmpRes == 0:
-            resSGD.append(0)
-        if tmpRes == 1:
-            resSGD.append(1)
-    csvfile = open('resSGD.csv', 'w',newline='')
-    writer = csv.writer(csvfile)
-    for i in range (1,80363):
-        writer.writerow([SubNum[i-1],resSGD[i-1]])
-    csvfile.close()
-    print('SGD DONE!')
+    # clf = SGDClassifier(loss="hinge", penalty="l2")
+    # clf.fit(X, Y)
+    # resSGD = []
+    # for item in data_test:
+    #     tmpRes = clf.predict(item)
+    #     if tmpRes == 0:
+    #         resSGD.append(0)
+    #     if tmpRes == 1:
+    #         resSGD.append(1)
+    # csvfile = open('resSGD.csv', 'w',newline='')
+    # writer = csv.writer(csvfile)
+    # for i in range (1,80363):
+    #     writer.writerow([SubNum[i-1],resSGD[i-1]])
+    # csvfile.close()
+    # print('SGD DONE!')
 
 ##Randomized Tree
-    clf = RandomForestClassifier(n_estimators=10)
-    clf.fit(X, Y)
-    resRT = []
-    for item in data_test:
-        tmpRes = clf.predict(item)
-        if tmpRes == 0:
-            resRT.append(0)
-        if tmpRes == 1:
-            resRT.append(1)
-    csvfile = open('resRT.csv', 'w',newline='')
-    writer = csv.writer(csvfile)
-    for i in range (1,80363):
-        writer.writerow([SubNum[i-1],resRT[i-1]])
-    csvfile.close()
-    print('RT DONE!')
+    # clf = RandomForestClassifier(n_estimators=10)
+    # clf.fit(X, Y)
+    # resRT = []
+    # for item in data_test:
+    #     tmpRes = clf.predict(item)
+    #     if tmpRes == 0:
+    #         resRT.append(0)
+    #     if tmpRes == 1:
+    #         resRT.append(1)
+    # csvfile = open('resRT.csv', 'w',newline='')
+    # writer = csv.writer(csvfile)
+    # for i in range (1,80363):
+    #     writer.writerow([SubNum[i-1],resRT[i-1]])
+    # csvfile.close()
+    # print('RT DONE!')
 
 ##Linear Regression
     clf = linear_model.LinearRegression()
     clf.fit(X, Y)
     resLR = []
     resLR_tmp = []
-    totaltmp = 0
     for item in data_test:
         tmpRes = clf.predict(item)
         resLR_tmp.append(tmpRes)
-        totaltmp += tmpRes
-    avertmp = totaltmp / 80362.0
     for item in resLR_tmp:
-        if item >= avertmp:
+        if item > 1:
             resLR.append(1)
-        if item < avertmp:
+        elif item < 0:
             resLR.append(0)
+        else:
+            resLR.append(item[0])
 
     csvfile = open('resLR.csv', 'w',newline='')
     writer = csv.writer(csvfile)
@@ -216,28 +202,28 @@ def main():
     print('LR DONE!')
 
 ##Bayes Regression
-    clf = linear_model.BayesianRidge()
-    clf.fit(X, Y)
-    resBR = []
-    resBR_tmp = []
-    totaltmp = 0
-    for item in data_test:
-        tmpRes = clf.predict(item)
-        resBR_tmp.append(tmpRes)
-        totaltmp += tmpRes
-    avertmp = totaltmp / 80362.0
-    for item in resBR_tmp:
-        if item >= avertmp:
-            resBR.append(1)
-        if item < avertmp:
-            resBR.append(0)
+    # clf = linear_model.BayesianRidge()
+    # clf.fit(X, Y)
+    # resBR = []
+    # resBR_tmp = []
+    # totaltmp = 0
+    # for item in data_test:
+    #     tmpRes = clf.predict(item)
+    #     resBR_tmp.append(tmpRes)
+    #     totaltmp += tmpRes
+    # avertmp = totaltmp / 80362.0
+    # for item in resBR_tmp:
+    #     if item >= avertmp:
+    #         resBR.append(1)
+    #     if item < avertmp:
+    #         resBR.append(0)
 
-    csvfile = open('resBR.csv', 'w',newline='')
-    writer = csv.writer(csvfile)
-    for i in range (1,80363):
-        writer.writerow([SubNum[i-1],resBR[i-1]])
-    csvfile.close()
-    print('BR DONE!')
+    # csvfile = open('resBR.csv', 'w',newline='')
+    # writer = csv.writer(csvfile)
+    # for i in range (1,80363):
+    #     writer.writerow([SubNum[i-1],resBR[i-1]])
+    # csvfile.close()
+    # print('BR DONE!')
 
 
 if __name__ == '__main__':
