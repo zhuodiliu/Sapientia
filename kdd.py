@@ -88,7 +88,7 @@ def fitAndTestProba(clf, X, Y, data_test, enroll_list, errors, name):
         tmpRes = clf.predict_proba(row)
         resTrain.append(tmpRes)
     for row in data_test:
-        tmpRes = clf.predict(row)
+        tmpRes = clf.predict_proba(row)
         resTest.append(tmpRes)
     utilities.normalizeResult(resTrain)
     utilities.normalizeResult(resTest)
@@ -156,6 +156,7 @@ def main():
 ##Bayes Regression
     # clf = linear_model.BayesianRidge()
     # fitAndTest(clf, X, Y, data_test, enroll_list, errors, 'BR')
+
 ##Output Errors
     print(errors)
 

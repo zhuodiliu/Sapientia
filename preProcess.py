@@ -1,5 +1,6 @@
 import csv
 from utilities import timeShift
+from utilities import timeShift2
 from scipy.sparse import csr_matrix
 from scipy.io import mmwrite
 
@@ -8,12 +9,21 @@ def featureProcess(filename):
 
     data = []
 
-    last_time = []
+    last_time=[]
     time_split =[]
-    
-    file = open(filename, 'rt')
-    file.readline()
-    log = csv.reader(file)
+
+    file1 = open(filename, 'rt')
+    file1.readline()
+    log = csv.reader(file1)
+
+    file2 = open("last_log.csv", 'rt')
+    lastlog = csv.reader(file2)
+
+    lastlogtime=[]
+    for line in lastlog:
+        lastlogtime.append(line[0])
+    file2.close()
+
     enroll_id = 0
     line_idx = -1
     for line in log:
@@ -21,14 +31,17 @@ def featureProcess(filename):
             enroll_id = int(line[0])
             last_time.append('0')
             line_idx += 1
-        last_time[line_idx] = max(last_time[line_idx], line[1])
-    file.close()
+        last_time[line_idx] =lastlogtime[enroll_id-1]
+
+    file1.close()
+
+
     print('%s last_time calculate finish' % filename)
 
     for lt in last_time:
         tmp_split = []
         for days  in range(-58, 0, 2):
-            tmp_split.append(timeShift(lt, days))
+            tmp_split.append(timeShift2(lt, days))
         time_split.append(tmp_split)
     print('%s time_split calculate finish: %d' % (filename, len(time_split)))
 
@@ -42,7 +55,7 @@ def featureProcess(filename):
     lag_split = []
     for lag in range(30, 900, 30):
         lag_split.append(lag)
-        
+
     csvfile = open(filename, 'rt')
     csvfile.readline()
     log = csv.reader(csvfile)
@@ -64,7 +77,7 @@ def featureProcess(filename):
     #     lag = (0 if line[4]=='null' else float(line[4]))
     #     idx_lag = 0 # from 0 to len(lag_split) + 1
     #     while idx_lag < len(lag_split) and lag_split[idx_lag] < lag:
-    #         idx_lag += 1 
+    #         idx_lag += 1
     #     bias = idx_time * (len(lag_split) + 1) + idx_lag
     #     bias *= 5
 
@@ -82,7 +95,7 @@ def featureProcess(filename):
 
     #     if line[3]=='video':
     #         data[line_idx][bias+5]+=1
- 
+
     # preparation for sparse matrix
     rows = []
     cols = []
@@ -110,24 +123,24 @@ def featureProcess(filename):
         lag = (0 if line[4]=='null' else float(line[4]))
         idx_lag = 0 # from 0 to len(lag_split)
         while idx_lag < len(lag_split) and lag_split[idx_lag] < lag:
-            idx_lag += 1 
+            idx_lag += 1
         bias = idx_time * (len(lag_split) + 1) + idx_lag
         bias *= 5
 
         if line[3]=='navigate':
-            row_value[bias]+=1
+            row_value[bias]=1
 
         if line[3]=='access':
-            row_value[bias+1]+=1
+            row_value[bias+1]=1
 
         if line[3]=='problem':
-            row_value[bias+2]+=1
+            row_value[bias+2]=1
 
         if line[3]=='page_close':
-            row_value[bias+3]+=1
+            row_value[bias+3]=1
 
         if line[3]=='video':
-            row_value[bias+4]+=1
+            row_value[bias+4]=1
 
     data_sparse = csr_matrix((values, (rows, cols)), shape=(row_cnt, 4500))
 

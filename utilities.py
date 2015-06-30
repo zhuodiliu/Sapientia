@@ -13,6 +13,15 @@ def getDayTime(time):
     sec = int(time[17:19])
     return datetime.datetime(year,month,day,hour,minu,sec)
 
+def getDayTime2(time):
+    year = int(time[0:4])
+    month = int(time[5:7])
+    day = int(time[8:10])
+    hour = 23
+    minu = 59
+    sec = 59
+    return datetime.datetime(year,month,day,hour,minu,sec)
+
 ## return the hours of t1 - t2
 def timeSubtract(t1, t2):
     dt1 = getDayTime(t1)
@@ -23,6 +32,12 @@ def timeSubtract(t1, t2):
 ## return a string for time + days
 def timeShift(time, days):
     dt = getDayTime(time)
+    ds = dt + datetime.timedelta(days)
+    return ds.strftime('%Y-%m-%dT%H:%M:%S')
+
+## return a string for time + days
+def timeShift2(time, days):
+    dt = getDayTime2(time)
     ds = dt + datetime.timedelta(days)
     return ds.strftime('%Y-%m-%dT%H:%M:%S')
 
@@ -66,7 +81,7 @@ def outputResult(enroll_list, result, filename):
     csvfile.close()
 
 # the splitted matrix share the same indices and data with original csr
-# changing the elements will change both 
+# changing the elements will change both
 def splitCsr(csr, row):
     assert row < csr.shape[0]
     indptr_1 = csr.indptr[:row + 1].copy()
@@ -81,5 +96,5 @@ def splitCsr(csr, row):
 
     mat_1 = csr_matrix((data_1,indices_1, indptr_1), shape=(row, csr.shape[1]))
     mat_2 = csr_matrix((data_2,indices_2, indptr_2), shape=(csr.shape[0] - row, csr.shape[1]))
-    
+
     return mat_1, mat_2

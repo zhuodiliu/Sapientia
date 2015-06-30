@@ -45,7 +45,7 @@ def objectTime():
 
 
 def logLag(logfile):
-    
+
     object_time = {}
     log_new = []
     log_new.append(['','','','',''])
@@ -65,7 +65,7 @@ def logLag(logfile):
             line[4] = 'null'
         log_new.append(line)
     csvfile.close()
-    
+
     csvfile = open("new_%s" % logfile, 'w', newline='')
     writer = csv.writer(csvfile)
     writer.writerows(log_new)
@@ -73,20 +73,29 @@ def logLag(logfile):
 
 def lastLog():
     last_log = [ ['0'] for i in range (200905) ]
-    csvfile = open('log_Train.csv', 'rt')
+
+    csvfile = open('date.csv', 'rt')
+    csvfile.readline()
+    date=csv.reader(csvfile)
+    datebyid={}
+    for line in date:
+        datebyid[line[0]]=line[2]
+
+
+    csvfile = open('enrollment_test.csv', 'rt')
     csvfile.readline()
     log = csv.reader(csvfile)
     for line in log:
         line_idx = int(line[0]) - 1
-        last_log[line_idx][0] = max(last_log[line_idx][0], line[1])
+        last_log[line_idx][0] = datebyid[line[2]]
     csvfile.close()
 
-    csvfile = open('log_Test.csv', 'rt')
+    csvfile = open('enrollment_train.csv', 'rt')
     csvfile.readline()
     log = csv.reader(csvfile)
     for line in log:
         line_idx = int(line[0]) - 1
-        last_log[line_idx][0] = max(last_log[line_idx][0], line[1])
+        last_log[line_idx][0] = datebyid[line[2]]
     csvfile.close()
 
     csvfile = open("last_log.csv", 'w', newline='')
