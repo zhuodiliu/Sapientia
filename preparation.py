@@ -2,12 +2,6 @@
 import csv
 import utilities
 
-def searchTimeCs(table, course):
-    for line in table:
-        if line[0] == course and line[4]!='null':
-            return line[4]
-    return 'null'
-
 def searchTime(table, module):
     course = ''
     for line in table:
@@ -18,7 +12,7 @@ def searchTime(table, module):
                 return line[4]
             else:
                 return searchTime(table, line[1])
-    return searchTimeCs(table, course)
+    return 'null'
 
 def objectTime():
     table_old = []
@@ -38,7 +32,7 @@ def objectTime():
         table_new.append([module,time])
         # print([module, time])
 
-    csvfile = open('objectTime.csv', 'w', newline='')
+    csvfile = open('objectTime_2.csv', 'w', newline='')
     writer = csv.writer(csvfile)
     writer.writerows(table_new)
     csvfile.close()
@@ -54,25 +48,34 @@ def logLag(logfile):
     lines_csv = csv.reader(csvfile)
     for line in lines_csv:
         object_time[line[0]] = line[1]
+    csvfile.close()
 
     csvfile = open(logfile, 'rt')
     csvfile.readline()
     lines_csv = csv.reader(csvfile)
+
+    csvfile_w = open("new_%s_2" % logfile, 'w', newline='')
+    writer = csv.writer(csvfile_w)
+    writer.writerow(['','','','',''])
+
     for line in lines_csv:
         if line[4] in object_time:
-            line[4] = utilities.timeSubtract(line[1], object_time[line[4]])
+            if object_time[line[4]] != 'null':
+                line[4] = utilities.timeSubtract(line[1], object_time[line[4]])
+            else:
+                line[4] = 'null'
         else:
             line[4] = 'null'
-        log_new.append(line)
-    csvfile.close()
+        writer.writerow(line)
+        # log_new.append(line)
 
-    csvfile = open("new_%s" % logfile, 'w', newline='')
-    writer = csv.writer(csvfile)
-    writer.writerows(log_new)
     csvfile.close()
+    csvfile_w.close()
 
-def lastLog():
-    last_log = [ ['0'] for i in range (200905) ]
+    
+
+def endTime():
+    end_time = [ ['0'] for i in range (200905) ]
 
     csvfile = open('date.csv', 'rt')
     csvfile.readline()
@@ -87,7 +90,7 @@ def lastLog():
     log = csv.reader(csvfile)
     for line in log:
         line_idx = int(line[0]) - 1
-        last_log[line_idx][0] = datebyid[line[2]]
+        end_time[line_idx][0] = datebyid[line[2]]
     csvfile.close()
 
     csvfile = open('enrollment_train.csv', 'rt')
@@ -95,17 +98,17 @@ def lastLog():
     log = csv.reader(csvfile)
     for line in log:
         line_idx = int(line[0]) - 1
-        last_log[line_idx][0] = datebyid[line[2]]
+        end_time[line_idx][0] = datebyid[line[2]]
     csvfile.close()
 
-    csvfile = open("last_log.csv", 'w', newline='')
+    csvfile = open("end_time.csv", 'w', newline='')
     writer = csv.writer(csvfile)
-    writer.writerows(last_log)
+    writer.writerows(end_time)
 
 
 
 if __name__ == '__main__':
     # objectTime()
-    # logLag('log_train.csv')
-    # logLag('log_test.csv')
-    lastLog()
+    logLag('log_train.csv')
+    logLag('log_test.csv')
+    # endTime()

@@ -3,6 +3,8 @@ import csv
 import datetime
 from numpy import *
 from scipy.sparse import csr_matrix
+import matplotlib.pyplot as plt
+import math
 
 def getDayTime(time):
     year = int(time[0:4])
@@ -98,3 +100,23 @@ def splitCsr(csr, row):
     mat_2 = csr_matrix((data_2,indices_2, indptr_2), shape=(csr.shape[0] - row, csr.shape[1]))
 
     return mat_1, mat_2
+
+def drawVector(vec, rows, cols, depth):
+    plt.figure(figsize=(16, 10))
+    vec_all = []
+    for d in range(depth):
+        vec_new = [([0]*cols) for i in range(rows)]
+        for i in range(rows):
+            for j in range(cols):
+                vec_new[i][j] = vec[depth*(i*cols+j)+d]
+        vec_all.append(vec_new)
+
+    for d in range(depth):
+        plot = plt.subplot(math.ceil(depth/4), 4, d + 1)
+        mat = abs(array(vec_all[d]))
+        # mat = array([([0.5]*cols) for i in range(rows)]) + 0.5 * mat
+        plot.imshow( mat, interpolation='nearest',
+                       cmap='binary', vmax=1, vmin=0)
+        plot.set_xticks(())
+        plot.set_yticks(())
+    plt.show()

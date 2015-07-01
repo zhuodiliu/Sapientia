@@ -1,6 +1,7 @@
 import csv
 import numpy as np
 from scipy.sparse import csr_matrix
+import utilities
 
 
 def appendRow(csr, row):
@@ -37,15 +38,7 @@ def splitCsr(csr, row):
     
     return mat_1, mat_2
 
-indptr = np.array([0, 2, 3, 6])
-indices = np.array([0, 2, 2, 0, 1, 2])
-data = np.array([1, 2, 3, 4, 5, 6])
-c = csr_matrix((data, indices, indptr), shape=(3, 3))
-a, b = sliceCsr(c, 1) 
-print(a.todense())
-print(b.todense())
-
-# file_log = open('new_log_train.csv', 'rt')
+# file_log = open('new_log_train.csv_2', 'rt')
 # file_log.readline()
 # log = csv.reader(file_log)
 # file_train = open('tmpTrain.csv', 'rt')
@@ -53,8 +46,7 @@ print(b.todense())
 # file_truth = open('truth_train.csv', 'rt')
 # truth = csv.reader(file_truth)
 
-# for line in log:
-#         print(line[4])
+
 
 # while True:
 #     row_train = next(train)
@@ -67,3 +59,7 @@ print(b.todense())
 #     for i in range(10,311,10):
 #             print (int(float(row_train[i])), end=' ')
 #     print('')
+
+
+c = [0.3, 0.0 , 0.5 ,0.1, 0.6, 0.2 , 0.9 ,0.3]
+utilities.drawVector(c, 2 ,2, 2)
